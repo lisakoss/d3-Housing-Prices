@@ -71,3 +71,27 @@ d3.csv("house_prices.csv", function(error, data) {
       .on('mouseover', tip.show)
       .on('mouseout', tip.hide);
 });
+
+d3.csv("house_zipcodes.csv", function(error, data) {
+    var select = d3.select("#zipCodeFilter")
+      .append("select")
+  
+    select
+      .on("change", function(d) {
+        var value = d3.select(this).property("value");
+        alert(value);
+      });
+  
+    select
+      .append("option")
+      .attr("value", "all")
+      .text("All")
+  
+    select.selectAll("option")
+      .data(data)
+      .enter()
+        .append("option")
+        .attr("value", function (d) { return d.zipcode; })
+        .text(function (d) { return d.zipcode; });
+  
+  });
