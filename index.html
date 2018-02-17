@@ -14,16 +14,39 @@
   </div>
 
   <div id="controls">
+    <p><strong>Filters</strong></p>
     <p><label for="zipcode">Zipcode: <span id="zipCodeFilter"></span></label></p>
+
+    <p>Price</p>
+    <div id="price" class="slider-range"></div>
+    <label for="priceamount">Price range:</label>
+    <input type="text" id="priceamount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+
+    <p>Square Feet</p>
+    <div id="sqft" class="slider-range"></div>
+    <label for="sqftamount">Sqft range:</label>
+    <input type="text" id="sqftamount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+
+    <p>Bedrooms</p>
+    <div id="bedrooms" class="slider-range"></div>
+    <label for="bedroomamount">Bedroom number:</label>
+    <input type="text" id="bedroomamount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+
+    <p>Bathrooms</p>
+    <div id="bathrooms" class="slider-range"></div>
+    <label for="bathroomamount">Bathroom number:</label>
+    <input type="text" id="bathroomamount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+
     <p><label for="waterfront">Waterfront: <span id="amenityFilter"></span></label></p>
   </div>
         
   <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
-  <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
-  <script src="http://code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
   <script src="//d3js.org/d3.v3.min.js"></script>
   <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
   <script src="https://d3js.org/d3-brush.v1.min.js"></script>
-  <script src="js/index.js"></script>
+  <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="http://code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+  <script defer src="js/index.js"></script>
+
 </body>
 </html>

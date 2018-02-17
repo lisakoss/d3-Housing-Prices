@@ -2,11 +2,9 @@ var dataset; //the full dataset
 var filterData  = "";
 var patt = new RegExp("all");
 
-//var color = d3.scale.category10();
-
+//waterfront color encoding
 var color = d3.scale.linear().domain([0,1])
         .range(['#e18d5f', '#0ac7af']);
-
 
 var width = 750;
 var height = 450;
@@ -28,13 +26,15 @@ var yAxis = d3.svg.axis()
     .scale(y)
     .orient("left");
 
+//tool tips for data points
 tip = d3.tip().attr('class', 'd3-tip').html(function(d) { 
+    var waterfrontType;
     if(d.waterfront == 1) {
-        d.waterfront = "yes";
+        waterfrontType = "yes";
      } else if(d.waterfront == 0) {
-         d.waterfront = "no";
+         waterfrontType = "no";
      } 
-     return "Zipcode: " + d.zipcode + "<br/>" + "Price: $" + d.price + "<br/>" + "Sqft: " + d.sqft_living + "<br/>" +  "Bedrooms: " + d.bedrooms + "<br/>" + "Bathrooms: " + d.bathrooms + "<br/>" + "Waterfront: " + d.waterfront + "<br/>" + "Renovated: " + d.yr_renovated; });
+     return "Zipcode: " + d.zipcode + "<br/>" + "Price: $" + d.price + "<br/>" + "Sqft: " + d.sqft_living + "<br/>" +  "Bedrooms: " + d.bedrooms + "<br/>" + "Bathrooms: " + d.bathrooms + "<br/>" + "Waterfront: " + waterfrontType + "<br/>" + "Renovated: " + d.yr_renovated; });
 
 var svg = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
@@ -151,7 +151,6 @@ d3.csv("house_zipcodes.csv", function(error, data) {
         filterUpdate(dataset);
       });
 
-  
     select
       .append("option")
       .attr("value", "all")
@@ -194,12 +193,59 @@ d3.csv("house_waterfront.csv", function(error, data) {
         .text("no");
 });
   
+// price slider filter
+$(function() {
+    $("#price").slider({
+    range: true,
+    min: 0,
+    max: 8000000,
+    values: [ 0, 8000000 ], slide: function(event, ui) {
+    $("#priceamount").val(ui.values[0] + " - " + ui.values[1]);
+    filterUpdate(dataset); } });
+    var minNum = $("#price").slider("values", 0 )
+    var maxNum = $("#price").slider("values", 1 )
+    $("#priceamount").val( minNum + " - " + maxNum );
+  });
 
+// square feet (living) filter
+  $(function() {
+    $("#sqft").slider({
+    range: true,
+    min: 290,
+    max: 14000,
+    values: [ 290, 14000 ], slide: function(event, ui) {
+    $("#sqftamount").val(ui.values[0] + " - " + ui.values[1]);
+    filterUpdate(dataset); } });
+    var minNum = $("#sqft").slider("values", 0 )
+    var maxNum = $("#sqft").slider("values", 1 )
+    $("#sqftamount").val( minNum + " - " + maxNum );
+  });
 
-/*d3.selectAll(".filter")
-        .on("change", function(d) {
-        console.log(this.value);
-        });*/
+  // bedrooms filter
+  $(function() {
+    $("#bedrooms").slider({
+    range: false,
+    min: 0,
+    max: 33,
+    values: [33], slide: function(event, ui) {
+    $("#bedroomamount").val(ui.values[0]);
+    filterUpdate(dataset); } });
+    var minNum = $("#bedrooms").slider("values", 0 )
+    $("#bedroomamount").val(minNum);
+  });
+
+// bathrooms filter
+$(function() {
+    $("#bathrooms").slider({
+    range: false,
+    min: 0,
+    max: 8,
+    values: [8], slide: function(event, ui) {
+    $("#bathroomamount").val(ui.values[0]);
+    filterUpdate(dataset); } });
+    var minNum = $("#bathrooms").slider("values", 0 )
+    $("#bathroomamount").val(minNum);
+    });
 
 function filterUpdate(dataset) {
     var selectedZipcode = document.getElementById("filterZipCode");
@@ -207,59 +253,55 @@ function filterUpdate(dataset) {
     var selectedWaterfront = document.getElementById("filterWaterfront");
     var waterfrontValue = selectedWaterfront.options[selectedWaterfront.selectedIndex].value;
 
+    // price
+    var priceSplit = document.getElementById("priceamount").value.split("-")
+    var minPrice = parseInt(priceSplit[0])
+    var maxPrice = parseInt(priceSplit[1])
+    var defaultPriceMin = 0;
+    var defaultPriceMax = 8000000;
+
+    // sqft
+    var sqftSplit = document.getElementById("sqftamount").value.split("-")
+    var minSqft = parseInt(sqftSplit[0])
+    var maxSqft = parseInt(sqftSplit[1])
+    var defaultSqftMin = 290;
+    var defaultSqftMax = 14000;
+
+    // bedrooms
+    var currentBedrooms = parseInt(document.getElementById("bedroomamount").value);
+    var defaultBedroomsMin = 0;
+    var defaultBedroomsMax = 33;
+
+    // bathrooms
+    var currentBathrooms = parseInt(document.getElementById("bathroomamount").value);
+    var defaultBathroomsMin = 0;
+    var defaultBathroomsMax = 8;
+
     filterData = dataset;
 
-    console.log(zipcodeValue);
-    console.log(waterfrontValue);
     if(zipcodeValue != "all") { 
         filterData = filterData.filter(d => d.zipcode == zipcodeValue); 
-    } else {
-        //filterData = dataset;
-    }
+    } 
+
     if(waterfrontValue != "all") { 
         filterData = filterData.filter(d => d.waterfront == waterfrontValue); 
-    } else {
-        //filterData = dataset;
+    } 
+
+    if(minPrice != defaultPriceMin || maxPrice != defaultPriceMax) {
+        filterData = filterData.filter(d => d["price"] >= minPrice && d["price"] < maxPrice);
     }
-    
+
+    if(minSqft != defaultSqftMin || maxSqft != defaultSqftMax) {
+        filterData = filterData.filter(d => d["sqft_living"] >= minSqft && d["sqft_living"] < maxSqft);
+    }
+
+    if(currentBedrooms != defaultBedroomsMax) {
+        filterData = filterData.filter(d => d["bedrooms"] <= currentBedrooms);
+    }
+
+    if(currentBathrooms != defaultBathroomsMax) {
+        filterData = filterData.filter(d => d["bathrooms"] <= currentBathrooms);
+    }
+
     drawVis(filterData);
 }
-
-/*function filterType(mytype, name) {
-    //add code to filter to mytype and rerender vis here
-    console.log(name);
-    var res = patt.test(mytype);
-    //console.log(res);
-    if(res){
-        //fitlerData = filterData + dataset;
-        drawVis(dataset); 
-    } else{
-        var ndata = dataset.filter(function(d) {
-        return d[name] == mytype;  
-    });
-    //filterData = ndata;
-    drawVis(ndata); }
-}*/
-
-/*function filterAmenity(mytype) {
-    //add code to filter to mytype and rerender vis here
-    console.log(mytype);
-    var res = patt.test(mytype);
-    console.log(res);
-    if(res){
-        filterData = "";
-        drawVis(dataset); 
-    } else{
-        if(filterData == "") {
-            var ndata = dataset.filter(function(d) {
-                return d.waterfront == mytype; 
-            });
-        } else {
-            var ndata = filterData.filter(function(d) {
-                return d.waterfront == mytype; 
-        });
-    }
-    filterData = ndata;
-    drawVis(ndata); }
-}*/
-

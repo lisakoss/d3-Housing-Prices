@@ -1,5 +1,5 @@
 body {
-  font: 10px sans-serif;
+  font: 12px sans-serif;
 }
 
 .axis path, .axis line {
@@ -33,4 +33,8 @@ body {
   margin: 0 auto;
   padding-left: 20px;
   padding-top: 30px;
+}
+
+#price, #sqft, #bedrooms, #bathrooms {
+  width: 500px;
 }
