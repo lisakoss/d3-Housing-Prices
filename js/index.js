@@ -1,4 +1,5 @@
 var dataset; //the full dataset
+var filterData  = "";
 var patt = new RegExp("all");
 
 //var color = d3.scale.category10();
@@ -62,30 +63,30 @@ d3.csv("house_prices.csv", function(error, data) {
   x.domain(d3.extent(data, function(d) { return d.sqft_living; })).nice();
   y.domain(d3.extent(data, function(d) { return d.price; })).nice();
 
+    chart.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis)
+        .append("text")
+        .attr("class", "label")
+        .attr("x", width)
+        .attr("y", -6)
+        .style("text-anchor", "end")
+        .text("Square Feet");
+
+    chart.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+        .append("text")
+        .attr("class", "label")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Sale Price")
+
   drawVis(dataset);
 });
-
-chart.append("g")
-.attr("class", "x axis")
-.attr("transform", "translate(0," + height + ")")
-.call(xAxis)
-.append("text")
-.attr("class", "label")
-.attr("x", width)
-.attr("y", -6)
-.style("text-anchor", "end")
-.text("Square Feet");
-
-chart.append("g")
-.attr("class", "y axis")
-.call(yAxis)
-.append("text")
-.attr("class", "label")
-.attr("transform", "rotate(-90)")
-.attr("y", 6)
-.attr("dy", ".71em")
-.style("text-anchor", "end")
-.text("Sale Price")
 
 
 //creates the data visualization
@@ -142,11 +143,12 @@ legend.append("text")
 d3.csv("house_zipcodes.csv", function(error, data) {
     var select = d3.select("#zipCodeFilter")
       .append("select")
+      .attr("id", "filterZipCode")
   
     select
       .on("change", function(d) {
-        console.log(this.value);
-        filterType(this.value);
+        //console.log(this.value);
+        filterUpdate(dataset);
       });
 
   
@@ -164,18 +166,96 @@ d3.csv("house_zipcodes.csv", function(error, data) {
   
 });
 
-function filterType(mytype) {
+//for creation of zipcode drop menu
+d3.csv("house_waterfront.csv", function(error, data) {
+    var amenitySelect = d3.select("#amenityFilter")
+        .append("select")
+        .attr("id", "filterWaterfront")
+
+    amenitySelect
+        .on("change", function(d) {
+        //console.log(this.value);
+        filterUpdate(dataset);
+        });
+
+    amenitySelect
+        .append("option")
+        .attr("value", "all")
+        .text("All");
+
+    amenitySelect
+        .append("option")
+        .attr("value", 1)
+        .text("yes");
+ 
+    amenitySelect   
+        .append("option")
+        .attr("value", 0)
+        .text("no");
+});
+  
+
+
+/*d3.selectAll(".filter")
+        .on("change", function(d) {
+        console.log(this.value);
+        });*/
+
+function filterUpdate(dataset) {
+    var selectedZipcode = document.getElementById("filterZipCode");
+    var zipcodeValue = selectedZipcode.options[selectedZipcode.selectedIndex].value;
+    var selectedWaterfront = document.getElementById("filterWaterfront");
+    var waterfrontValue = selectedWaterfront.options[selectedWaterfront.selectedIndex].value;
+
+    filterData = dataset;
+
+    console.log(zipcodeValue);
+    console.log(waterfrontValue);
+    if(zipcodeValue != "all") { 
+        filterData = filterData.filter(d => d.zipcode == zipcodeValue); } 
+        else {
+
+    }
+    if(waterfrontValue != "all") { filterData = filterData.filter(d => d.waterfront == waterfrontValue); }
+    
+    drawVis(filterData);
+}
+
+/*function filterType(mytype, name) {
+    //add code to filter to mytype and rerender vis here
+    console.log(name);
+    var res = patt.test(mytype);
+    //console.log(res);
+    if(res){
+        //fitlerData = filterData + dataset;
+        drawVis(dataset); 
+    } else{
+        var ndata = dataset.filter(function(d) {
+        return d[name] == mytype;  
+    });
+    //filterData = ndata;
+    drawVis(ndata); }
+}*/
+
+/*function filterAmenity(mytype) {
     //add code to filter to mytype and rerender vis here
     console.log(mytype);
     var res = patt.test(mytype);
     console.log(res);
     if(res){
+        filterData = "";
         drawVis(dataset); 
     } else{
-        var ndata = dataset.filter(function(d) {
-        return d.zipcode == mytype; 
-        
-    });
-    console.log(ndata);
+        if(filterData == "") {
+            var ndata = dataset.filter(function(d) {
+                return d.waterfront == mytype; 
+            });
+        } else {
+            var ndata = filterData.filter(function(d) {
+                return d.waterfront == mytype; 
+        });
+    }
+    filterData = ndata;
     drawVis(ndata); }
-}
+}*/
+
