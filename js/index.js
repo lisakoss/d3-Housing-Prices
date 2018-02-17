@@ -212,11 +212,15 @@ function filterUpdate(dataset) {
     console.log(zipcodeValue);
     console.log(waterfrontValue);
     if(zipcodeValue != "all") { 
-        filterData = filterData.filter(d => d.zipcode == zipcodeValue); } 
-        else {
-
+        filterData = filterData.filter(d => d.zipcode == zipcodeValue); 
+    } else {
+        //filterData = dataset;
     }
-    if(waterfrontValue != "all") { filterData = filterData.filter(d => d.waterfront == waterfrontValue); }
+    if(waterfrontValue != "all") { 
+        filterData = filterData.filter(d => d.waterfront == waterfrontValue); 
+    } else {
+        //filterData = dataset;
+    }
     
     drawVis(filterData);
 }
