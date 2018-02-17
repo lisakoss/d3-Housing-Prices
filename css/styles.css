@@ -38,3 +38,22 @@ body {
 #price, #sqft, #bedrooms, #bathrooms {
   width: 500px;
 }
+
+#controls {
+  margin-top: 100px;
+  background-color: #9bd4d9;
+  width: 500px;
+  padding: 10px 25px;
+  float: left;
+  color: #3c3c3c;
+  border-radius: 25px;
+}
+
+input {
+  background-color: #9bd4d9;
+  color: #474747;
+}
+
+.chart {
+  float: left;
+}
