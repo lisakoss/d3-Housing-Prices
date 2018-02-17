@@ -33,7 +33,7 @@ tip = d3.tip().attr('class', 'd3-tip').html(function(d) {
      } else if(d.waterfront == 0) {
          d.waterfront = "no";
      } 
-     return "Price: $" + d.price + "<br/>" + "Sqft: " + d.sqft_living + "<br/>" +  "Bedrooms: " + d.bedrooms + "<br/>" + "Bathrooms: " + d.bathrooms + "<br/>" + "Waterfront: " + d.waterfront + "<br/>" + "Renovated: " + d.yr_renovated; });
+     return "Zipcode: " + d.zipcode + "<br/>" + "Price: $" + d.price + "<br/>" + "Sqft: " + d.sqft_living + "<br/>" +  "Bedrooms: " + d.bedrooms + "<br/>" + "Bathrooms: " + d.bathrooms + "<br/>" + "Waterfront: " + d.waterfront + "<br/>" + "Renovated: " + d.yr_renovated; });
 
 var svg = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
@@ -62,41 +62,41 @@ d3.csv("house_prices.csv", function(error, data) {
   x.domain(d3.extent(data, function(d) { return d.sqft_living; })).nice();
   y.domain(d3.extent(data, function(d) { return d.price; })).nice();
 
-  chart.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis)
-    .append("text")
-      .attr("class", "label")
-      .attr("x", width)
-      .attr("y", -6)
-      .style("text-anchor", "end")
-      .text("Square Feet");
-
-  chart.append("g")
-      .attr("class", "y axis")
-      .call(yAxis)
-    .append("text")
-      .attr("class", "label")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", ".71em")
-      .style("text-anchor", "end")
-      .text("Sale Price")
-
   drawVis(dataset);
 });
 
+chart.append("g")
+.attr("class", "x axis")
+.attr("transform", "translate(0," + height + ")")
+.call(xAxis)
+.append("text")
+.attr("class", "label")
+.attr("x", width)
+.attr("y", -6)
+.style("text-anchor", "end")
+.text("Square Feet");
+
+chart.append("g")
+.attr("class", "y axis")
+.call(yAxis)
+.append("text")
+.attr("class", "label")
+.attr("transform", "rotate(-90)")
+.attr("y", 6)
+.attr("dy", ".71em")
+.style("text-anchor", "end")
+.text("Sale Price")
+
 
 //creates the data visualization
-function drawVis() {
+function drawVis(ndata) {
     var circle = chart.selectAll(".dot")
-        .data(dataset);
+        .data(ndata);
 
     circle
         .attr("cx", function(d) { return x(d.sqft_living); })
         .attr("cy", function(d) { return y(d.price); })
-            .style("fill", function(d, i) { return color(d.waterfront) })
+        .style("fill", function(d, i) { return color(d.waterfront) })
            
     circle.exit().remove();
 
@@ -105,39 +105,38 @@ function drawVis() {
         .attr("r", 4.5)
         .attr("cx", function(d) { return x(d.sqft_living); })
         .attr("cy", function(d) { return y(d.price); })
-            .style("fill", function(d, i) { return color(d.waterfront) })
-            .style("opacity", 0.8)
-            .style("stroke", "#363636")
+        .style("fill", function(d, i) { return color(d.waterfront) })
+        .style("opacity", 0.8)
+        .style("stroke", "#363636")
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
-
 }
 
 //creates legend for the graph
 var legend = chart.selectAll(".legend")
-.data(color.domain())
-.enter().append("g")
-.attr("class", "legend")
-.attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+    .data(color.domain())
+    .enter().append("g")
+    .attr("class", "legend")
+    .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
 legend.append("rect")
-.attr("x", width - 18)
-.attr("width", 18)
-.attr("height", 18)
-.style("fill", color);
+    .attr("x", width - 18)
+    .attr("width", 18)
+    .attr("height", 18)
+    .style("fill", color);
 
 legend.append("text")
     .attr("x", width - 24)
     .attr("y", 9)
     .attr("dy", ".35em")
-        .style("text-anchor", "end")
-        .text(function(d) { 
-            if(d == 0) {
-                return "no waterfront"
-            } else {
-                return "has waterfront"
-            }
-        });
+    .style("text-anchor", "end")
+    .text(function(d) { 
+        if(d == 0) {
+            return "no waterfront"
+        } else {
+            return "has waterfront"
+        }
+});
 
 //for creation of zipcode drop menu
 d3.csv("house_zipcodes.csv", function(error, data) {
@@ -146,9 +145,10 @@ d3.csv("house_zipcodes.csv", function(error, data) {
   
     select
       .on("change", function(d) {
-        var value = d3.select(this).property("value");
-        alert(value);
+        console.log(this.value);
+        filterType(this.value);
       });
+
   
     select
       .append("option")
@@ -162,4 +162,20 @@ d3.csv("house_zipcodes.csv", function(error, data) {
         .attr("value", function (d) { return d.zipcode; })
         .text(function (d) { return d.zipcode; });
   
-  });
+});
+
+function filterType(mytype) {
+    //add code to filter to mytype and rerender vis here
+    console.log(mytype);
+    var res = patt.test(mytype);
+    console.log(res);
+    if(res){
+        drawVis(dataset); 
+    } else{
+        var ndata = dataset.filter(function(d) {
+        return d.zipcode == mytype; 
+        
+    });
+    console.log(ndata);
+    drawVis(ndata); }
+}
